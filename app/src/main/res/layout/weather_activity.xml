@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="193dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_main_day"
+                android:layout_width="50dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:padding="5dp"
+                tools:hint="icon"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/max_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="16dp"
+                android:textSize="48sp"
+                tools:hint="max" />
+
+            <TextView
+                android:id="@+id/min_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                tools:hint="min" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.5"
+                android:textSize="20sp"
+                tools:hint="℃" />
+
+            <ImageView
+                android:id="@+id/icon_main_night"
+                android:layout_width="50dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:padding="10dp"
+                tools:hint="icon"
+                tools:srcCompat="@tools:sample/avatars" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/legend_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:padding="16dp"
+            android:textSize="25sp"
+            tools:hint="stats for this date showing different trends of temprature and rainfall along with other natural calamities." />
+
+        <Button
+            android:id="@+id/button_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="16dp"
+            android:text="More Data" />
+    </LinearLayout>
+</RelativeLayout>
