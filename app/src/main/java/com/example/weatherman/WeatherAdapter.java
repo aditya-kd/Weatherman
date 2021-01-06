@@ -34,11 +34,13 @@ import java.util.Locale;
 import javax.xml.XMLConstants;
 
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
-    public static String HEAD_MAX="0", HEAD_MIN="0", HEAD_ICON="0";
+
     Context mContext;
     ViewGroup parentVG;
     static String DayIcon,NightIcon;
     Integer[] iconList= new Integer[50];
+    public static String CurrDayMax="0";
+
     public static class WeatherViewHolder extends RecyclerView.ViewHolder{
 
         //create variables for layout
@@ -160,10 +162,12 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
                             Log.d("myOutput",DayIcon+"/"+NightIcon);
                             if(i==0)
                             {
-                                HEAD_MAX=toCelcius(max);
-                                HEAD_MIN=toCelcius(min);
-                                HEAD_ICON=DayIcon;
-                                Log.d("CurrDay",HEAD_MAX+"/"+HEAD_MIN+" icon "+HEAD_ICON);
+                                CurrDayMax=toCelcius(max);
+
+//                                HEAD_MIN=toCelcius(min);
+//                                HEAD_ICON=DayIcon;
+//                                CurrDayMain= new TodayForecast(toCelcius(max), toCelcius(min), DayIcon, NightIcon);
+//                                Log.d("CurrDay",HEAD_MAX+"/"+HEAD_MIN+" icon "+HEAD_ICON);
                             }
 
                             Forecast current=new Forecast(
@@ -190,13 +194,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         });//request
         requestQueue.add(request);
     }//loadForecast ends here
-    public static String getHeadMax(){
-        return HEAD_MAX;
-    }
-    public static String getHeadMin()
-    {
-        return HEAD_MIN;
-    }
+
     private String toCelcius(double t)
     {
         double n=(t-32)*(0.5556);
