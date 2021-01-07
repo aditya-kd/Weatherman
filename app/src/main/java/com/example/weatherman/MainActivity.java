@@ -1,14 +1,22 @@
 package com.example.weatherman;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,16 +36,45 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.LongFunction;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity implements LocationListener {
+    public static Integer[] HeadIcons= new Integer[10];
     private Context AppContext;
     Integer[] iconList= new Integer[50];
     private RequestQueue requestQueue;
     private RequestQueue requestQueue2;
+    LocationManager locationManager;
+    String Latitude,longitude;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        /*Code to get location*/
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]
+                    {Manifest.permission.ACCESS_FINE_LOCATION
+                    },100);
+        }
+        try {
+            locationManager=(LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,MainActivity.this);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        /*Ends here*/
+
+
+
+
+
+
+
+
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
         AppContext=getApplicationContext();
         setIconList();
@@ -226,6 +263,27 @@ public class MainActivity extends AppCompatActivity {
         iconList[35]=R.drawable.partly_cloudy_night;
         iconList[39]=R.drawable.partly_cloudy_w_showers_night;
         iconList[41]=R.drawable.partly_cloudy_w_t_storms_night;
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Latitude=String.valueOf(location.getLatitude());
+        longitude=String.valueOf(location.getLongitude());
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+
     }
 }
 
