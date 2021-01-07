@@ -21,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,6 @@ import java.util.function.LongFunction;
 
 public class MainActivity extends AppCompatActivity {
     public static Integer[] HeadIcons= new Integer[10];
-    public String max_temp_for_curDay;
-    private static final int request_location=1;
-    //creating a local manager var
-    LocationManager location_manager;
-    //creating a string type var for storing latitude and longitude
-    String Latitude,longitude;
     private Context AppContext;
     Integer[] iconList= new Integer[50];
     private RequestQueue requestQueue;
@@ -43,20 +38,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
-
         AppContext=getApplicationContext();
+        setIconList();
         initiateLoading();
-
         RecyclerView.Adapter adapter = new WeatherAdapter(getApplicationContext());
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
-
-
-
     }
     List<Forecast> todayList= new ArrayList<>(12);
     private void initiateLoading()
@@ -66,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private void loadTodayForecast()
     {
-        TextView TodayMax=findViewById(R.id.head_max);
-        ImageView HeaderIcon= findViewById(R.id.head_icon);
         String url="https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/206679?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
         Log.d("main","url="+url);
 
@@ -84,19 +71,30 @@ public class MainActivity extends AppCompatActivity {
                             String iconNumber = current_hr.getString("WeatherIcon");
                             String rain = current_hr.getString("PrecipitationProbability");
                             JSONObject t = current_hr.getJSONObject("Temperature");
+                            String MobileLink= current_hr.getString("MobileLink");
                             double t2 = t.getDouble("Value");
                             String temp = toCelcius(t2);
+
+                            String pDate=date.substring(0,date.indexOf('T'));
+                            pDate=manageDate(pDate);
                             Log.d("main", "iconPhrase" + iconPhrase);
                             Log.d("main", "date" + date);
                             Log.d("main", "iconNumber" + iconNumber);
                             Log.d("main", "rain" + rain);
                             Log.d("main", "double " + t2 + "");
                             Log.d("main", "temp" + temp);
+                            Log.d("main", "MobileLink" + MobileLink);
 
                             if (i == 0) {
+                                TextView presentDay_temp_textview= findViewById(R.id.head_max);
+                                presentDay_temp_textview.setText(temp+"°");
+                                ImageView presentDay_icon_view= findViewById(R.id.head_icon);
+                                Log.d("main",Integer.parseInt(iconNumber)+"");
+                                presentDay_icon_view.setImageResource(iconList[Integer.parseInt(iconNumber)]);
 //                                TodayMax.setText(temp);
 //                                HeaderIcon.setImageResource(iconList[Integer.parseInt(iconNumber)]);
                             }
+                            todayList.add(new Forecast("0",temp,MobileLink, pDate,iconNumber,iconPhrase));
                         }
                     }
                     catch (JSONException e)
@@ -119,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
     {
         double n=(t-32)*(0.5556);
         return (String.format(Locale.ENGLISH,"%.1f",n));
+    }
+    private String manageDate(String d)
+    {
+        String[] months={"","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        int m= Integer.parseInt(d.substring(5,d.lastIndexOf('-')));
+        String s=d.substring(d.lastIndexOf('-')+1);
+        return s+" "+months[m];
     }
     private void setIconList()
     {
