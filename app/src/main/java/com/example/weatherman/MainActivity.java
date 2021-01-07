@@ -36,13 +36,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.LongFunction;
 
+
 public class MainActivity extends AppCompatActivity implements LocationListener {
     public static Integer[] HeadIcons= new Integer[10];
     private Context AppContext;
     Integer[] iconList= new Integer[50];
     private RequestQueue requestQueue;
+    private RequestQueue requestQueue2;
     LocationManager locationManager;
     String Latitude,longitude;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +88,60 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void initiateLoading()
     {
         requestQueue= Volley.newRequestQueue(AppContext);
+        requestQueue2= Volley.newRequestQueue(AppContext);
+        loadPresentCondition();
         loadTodayForecast();
     }
+    private void loadPresentCondition()
+    {
+        String url="https://dataservice.accuweather.com/forecasts/v1/daily/1day/206679?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
+        Log.d("main","url"+url);
+
+        JsonObjectRequest presentConditionRequest= new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    try {
+                        //processing here
+                        JSONObject presentCondition = response.getJSONObject("Headline");
+                        String text= presentCondition.getString("Text");
+                        Log.d("present","");
+                        JSONArray forecastlist= response.getJSONArray("DailyForecasts");
+                        JSONObject forecast= forecastlist.getJSONObject(0);
+                        JSONObject temperature= forecast.getJSONObject("Temperature");
+                        JSONObject present_min= temperature.getJSONObject("Minimum");
+                        JSONObject present_max= temperature.getJSONObject("Maximum");
+                        String pr_max= toCelcius(present_max.getDouble("Value"));
+                        String pr_min= toCelcius(present_min.getDouble("Value"));
+                        //Log.d("present",temperature.toString());
+
+                        Log.d("present",pr_max);
+                        Log.d("present",pr_min);
+
+                        TextView max_view= findViewById(R.id.present_max_view);
+                        max_view.setText(pr_max);
+                        TextView min_view= findViewById(R.id.present_min_view);
+                        min_view.setText("/"+pr_min+"℃");
+                    }
+                    catch (JSONException e)
+                    {
+                        Log.e("main","catch error occured",e);
+                    }
+
+                },
+                error -> {
+                    CharSequence text = "Problem at the servers. Try again after sometime";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(AppContext, text, duration);
+                    toast.show();
+                    Log.e("main","VOLLEY ERROR");
+                    Log.e("main","using offline data");
+                }
+        );
+        requestQueue2.add(presentConditionRequest);
+    }
+
     private void loadTodayForecast()
     {
         String url="https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/206679?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
@@ -125,10 +180,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 ImageView presentDay_icon_view= findViewById(R.id.head_icon);
                                 Log.d("main",Integer.parseInt(iconNumber)+"");
                                 presentDay_icon_view.setImageResource(iconList[Integer.parseInt(iconNumber)]);
-//                                TodayMax.setText(temp);
-//                                HeaderIcon.setImageResource(iconList[Integer.parseInt(iconNumber)]);
+                                TextView presentDate_view= findViewById(R.id.present_date);
+                                presentDate_view.setText(pDate);
+                                TextView phraseIcon_view= findViewById(R.id.icon_phrase_view);
+                                phraseIcon_view.setText(iconPhrase);
+                                TextView rainfall_view= findViewById(R.id.rainfall);
+                                rainfall_view.setText("Rain: "+rain+"%");
+
                             }
-                            todayList.add(new Forecast("0",temp,MobileLink, pDate,iconNumber,iconPhrase));
+                            todayList.add(new Forecast("0", temp, MobileLink, pDate, iconNumber, iconPhrase));
                         }
                     }
                     catch (JSONException e)

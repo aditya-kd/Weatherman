@@ -40,7 +40,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
     static String DayIcon,NightIcon;
     Integer[] iconList= new Integer[50];
     public static String CurrDayMax="0";
-
+    public String present_min;
     public static class WeatherViewHolder extends RecyclerView.ViewHolder{
 
         //create variables for layout
@@ -49,6 +49,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         public TextView min;
         public TextView date;
         public ImageView day_icon, night_icon;
+        public TextView presentMin_view;
 
         //constructor
         public WeatherViewHolder(View v){
@@ -80,6 +81,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
     {
         requestQueue= Volley.newRequestQueue(context);
         mContext=context;
+
         setIconList();
         loadForecast();
     }
@@ -100,13 +102,13 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
 
     @Override
     public void onBindViewHolder(@NonNull WeatherViewHolder holder, int position) {
-        Forecast obj= values.get(position);
 
+
+        Forecast obj= values.get(position);
         holder.max.setText(obj.getMax());
         holder.min.setText(obj.getMin());
         holder.date.setText(obj.getDate());
         holder.day_icon.setImageResource(iconList[Integer.parseInt(obj.getDay_Icon_num())]);
-        //holder.night_icon.setImageResource(obj.getNight_Icon_num());
         holder.containerView.setTag(obj);
     }
     List<String> headline= new ArrayList<>();
@@ -162,12 +164,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
                             Log.d("myOutput",DayIcon+"/"+NightIcon);
                             if(i==0)
                             {
-                                CurrDayMax=toCelcius(max);
-
-//                                HEAD_MIN=toCelcius(min);
-//                                HEAD_ICON=DayIcon;
-//                                CurrDayMain= new TodayForecast(toCelcius(max), toCelcius(min), DayIcon, NightIcon);
-//                                Log.d("CurrDay",HEAD_MAX+"/"+HEAD_MIN+" icon "+HEAD_ICON);
+                                present_min= toCelcius(min);
+//                                presentMin_view= parentVG.findViewById(R.id.present_min_view);
+//                                presentMin_view.setText("/"+present_min+"°");
                             }
 
                             Forecast current=new Forecast(
@@ -200,11 +199,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         double n=(t-32)*(0.5556);
         return (String.format(Locale.ENGLISH,"%.1f",n));
     }
-    private String toCelcius2(double t)
-    {
-        double n=(t-32)*(0.5556);
-        return (String.format(Locale.ENGLISH,"%.0f",n));
-    }
+
     private String manageDate(String d)
     {
         String[] months={"","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
