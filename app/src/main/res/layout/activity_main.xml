@@ -4,33 +4,92 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Today"
-        android:padding="10dp"
-        />
 
-    <ImageView
-        android:id="@+id/head_icon"
-        android:layout_width="120sp"
-        android:layout_height="120sp"
-        android:layout_gravity="center"
-        tools:srcCompat="@tools:sample/avatars[1]" />
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/head_temp_tv"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:orientation="horizontal">
+
         <TextView
-            android:id="@+id/head_max"
+            android:id="@+id/present_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:text="Today" />
+
+        <LinearLayout
+            android:id="@+id/head_temp_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textColor="@color/black"
-            android:textSize="43sp"
-            tools:hint="Max" />
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/head_icon"
+                android:layout_width="120sp"
+                android:layout_height="120sp"
+                android:layout_gravity="center"
+                tools:srcCompat="@tools:sample/avatars[1]" />
+
+            <TextView
+                android:id="@+id/head_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="43sp"
+                tools:hint="Max" />
+
+        </LinearLayout>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:layout_gravity="right"
+    >
+    <TextView
+        android:id="@+id/icon_phrase_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:hint="icon phrase"
+        android:layout_gravity="right"
+        android:padding="5dp"
+        />
+    <TextView
+        android:id="@+id/rainfall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:hint="rain percent"
+        android:layout_gravity="right"
+        android:padding="5dp"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="right"
+        >
+    <TextView
+        android:id="@+id/present_max_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:hint="max/"
+
+        android:padding="5dp" />
+        <TextView
+            android:id="@+id/present_min_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:hint="min"
+
+            />
+    </LinearLayout>
+</LinearLayout>
 
     </LinearLayout>
     <TextView
