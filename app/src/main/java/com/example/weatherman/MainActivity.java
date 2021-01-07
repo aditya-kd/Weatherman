@@ -38,7 +38,7 @@ import java.util.function.LongFunction;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
-    public static Integer[] HeadIcons= new Integer[10];
+
     private Context AppContext;
     Integer[] iconList= new Integer[50];
     private RequestQueue requestQueue;
@@ -66,14 +66,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             e.printStackTrace();
         }
         /*Ends here*/
-
-
-
-
-
-
-
-
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
         AppContext=getApplicationContext();
@@ -269,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(@NonNull Location location) {
         Latitude=String.valueOf(location.getLatitude());
         longitude=String.valueOf(location.getLongitude());
+        Log.d("mainLocation","location="+Latitude+"/"+longitude);
     }
 
     @Override
