@@ -9,15 +9,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical">
         <TextView
             android:id="@+id/present_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="Today" />
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="5dp"
 
+            android:text="Today" />
+        <TextView
+            android:id="@+id/present_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="City Name" />
+
+</LinearLayout>
         <LinearLayout
             android:id="@+id/head_temp_tv"
             android:layout_width="wrap_content"
@@ -25,7 +38,7 @@
             android:layout_gravity="center"
             android:orientation="vertical"
             android:layout_weight="1"
-            android:padding="16dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/head_icon"

@@ -8,12 +8,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -29,12 +29,13 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
-import java.util.function.LongFunction;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -44,9 +45,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private RequestQueue requestQueue;
     private RequestQueue requestQueue2;
     LocationManager locationManager;
-    String Latitude,longitude;
-
-
+    String Latitude="0",longitude="0";
+    static String citykey;
+    RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,30 +66,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         {
             e.printStackTrace();
         }
-        /*Ends here*/
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
         AppContext=getApplicationContext();
+        requestQueue= Volley.newRequestQueue(AppContext);
+
+        recyclerView = findViewById(R.id.recyclerView_main);
+
         setIconList();
-        initiateLoading();
-        RecyclerView.Adapter adapter = new WeatherAdapter(getApplicationContext());
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(layoutManager);
     }
     List<Forecast> todayList= new ArrayList<>(12);
-    private void initiateLoading()
+    private void initiateLoading(String key, String name)
     {
-        requestQueue= Volley.newRequestQueue(AppContext);
-        requestQueue2= Volley.newRequestQueue(AppContext);
-        loadPresentCondition();
-        loadTodayForecast();
-    }
-    private void loadPresentCondition()
-    {
-        String url="https://dataservice.accuweather.com/forecasts/v1/daily/1day/206679?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
-        Log.d("main","url"+url);
+        citykey=key;
+        TextView presentLocation= findViewById(R.id.present_location);
+        presentLocation.setText(name);
+        Log.d("city key in initate", citykey);
+        Log.d("key in initiateLoading", key);
+        loadPresentCondition(key);
+        loadTodayForecast(key);
 
+    RecyclerView.Adapter adapter = new WeatherAdapter(getApplicationContext(),Latitude,longitude,key);
+    recyclerView.setAdapter(adapter);
+    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+    recyclerView.setLayoutManager(layoutManager);
+    }
+    private void loadPresentCondition(String key)
+    {
+        String A="https://dataservice.accuweather.com/forecasts/v1/daily/1day/";
+    String B="?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
+        String url=A.concat(key);
+        url=url.concat(B);
+        Log.d("main","url"+url);
+        Log.d("key in loadPresent",key);
         JsonObjectRequest presentConditionRequest= new JsonObjectRequest(
                 Request.Method.GET,
                 url,
@@ -131,12 +140,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     Log.e("main","using offline data");
                 }
         );
-        requestQueue2.add(presentConditionRequest);
+        requestQueue.add(presentConditionRequest);
     }
 
-    private void loadTodayForecast()
+    private void loadTodayForecast(String key)
     {
-        String url="https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/206679?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
+        String A="https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
+        String B="?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
+        String url= A.concat(key);
+        url=url.concat(B);
+        Log.d("key in loadTOday",key);
         Log.d("main","url="+url);
 
         JsonArrayRequest request = new JsonArrayRequest(
@@ -262,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Latitude=String.valueOf(location.getLatitude());
         longitude=String.valueOf(location.getLongitude());
         Log.d("mainLocation","location="+Latitude+"/"+longitude);
+        loadCityKey();
     }
 
     @Override
@@ -276,6 +290,62 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onProviderDisabled(@NonNull String provider) {
+
+    }
+
+    public void loadCityKey() {
+
+        String baseUrl = "https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t&q=" +
+                Latitude +
+                "," +
+                longitude +
+                "&details=true";
+        Log.d("mainLocation in loadKey()",Latitude+","+longitude);
+        Log.d("CityKey URL",baseUrl);
+
+        JsonObjectRequest getKeyRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                baseUrl,
+                null,
+                response -> {
+                    try {
+
+                        String myResponse= response.toString();
+                        Log.d("String Response", myResponse);
+                        String key=(myResponse.substring(20, 26));
+
+                        Log.d("KEy",key);
+
+                        int nameIndex= myResponse.indexOf("LocalizedName");
+                        nameIndex+=12+3+1;
+                        char ch='0';
+                        String LocalizedName="";
+                        ch=myResponse.charAt(nameIndex);
+                        while(ch!='"')
+                        {
+                            LocalizedName+=ch;
+                            ch=myResponse.charAt(++nameIndex);
+                        }
+                        Log.d("Key", key);
+                        Log.d("LocalizedName",LocalizedName);
+                        citykey=key;
+                        Log.d("citykey", citykey);
+                        initiateLoading(key,LocalizedName);
+                    }
+                    catch (StringIndexOutOfBoundsException e) {
+                       Log.e("catch","json error in catch");
+                    }
+                },
+                error -> {
+                    CharSequence text = "Problem at the servers. Try again after sometime";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(AppContext, text, duration);
+                    toast.show();
+                    Log.e("main", "VOLLEY ERROR");
+                    Log.e("main", "using offline data");
+                }
+        );
+        requestQueue.add(getKeyRequest);
 
     }
 }
