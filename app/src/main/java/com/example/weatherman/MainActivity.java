@@ -66,7 +66,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             e.printStackTrace();
         }
         /*Ends here*/
+        /*For some delay*/
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        },10000);
         RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
         AppContext=getApplicationContext();
         setIconList();

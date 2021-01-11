@@ -16,6 +16,11 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION
+                            },100);
+                }
                 Intent i= new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(i);
                 finish();
