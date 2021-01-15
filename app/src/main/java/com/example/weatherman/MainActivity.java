@@ -37,42 +37,26 @@ import java.util.Locale;
 import java.util.function.LongFunction;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity  {
+
+
+
 
     private Context AppContext;
     Integer[] iconList= new Integer[50];
     private RequestQueue requestQueue;
     private RequestQueue requestQueue2;
-    LocationManager locationManager;
-    String Latitude,longitude;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*Code to get location*/
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]
-                    {Manifest.permission.ACCESS_FINE_LOCATION
-                    },100);
-        }
-        try {
-            locationManager=(LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,MainActivity.this);
 
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        /*Ends here*/
-        /*For some delay*/
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
 
-            }
-        },10000);
+
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView_main);
         AppContext=getApplicationContext();
         setIconList();
@@ -263,27 +247,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         iconList[41]=R.drawable.partly_cloudy_w_t_storms_night;
     }
 
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Latitude=String.valueOf(location.getLatitude());
-        longitude=String.valueOf(location.getLongitude());
-        Log.d("mainLocation","location="+Latitude+"/"+longitude);
-    }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-
-    }
 }
 
 //implementation 'com.android.volley:volley:1.1.1'
