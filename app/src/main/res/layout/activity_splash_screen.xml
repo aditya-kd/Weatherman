@@ -22,6 +22,8 @@
         android:fontFamily="monospace"
         android:layout_below="@+id/logo_id"
         android:text="Weatherman"
+        android:textStyle="bold"
+
         android:textSize="35sp"
         />
 

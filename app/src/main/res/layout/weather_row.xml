@@ -8,13 +8,21 @@
     android:orientation="horizontal"
     android:paddingTop="16dp"
     >
+
+    <ImageView
+        android:id="@+id/icon_tv"
+        android:layout_width="44dp"
+        android:layout_height="50sp"
+        android:layout_weight="1"
+        tools:srcCompat="@tools:sample/avatars" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/max_tv"
         tools:hint="Max"
         android:textSize="24sp"
-        android:paddingRight="10dp"
+        android:textStyle="bold"
+        android:paddingRight="15dp"
         android:paddingLeft="16dp"
         />
 
@@ -24,13 +32,10 @@
         android:id="@+id/min_tv"
         tools:hint="Min"
         android:textSize="18sp"
+        android:paddingRight="20dp"
+        android:paddingLeft="10dp"
         />
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50sp"
-        android:id="@+id/icon_tv"
-        android:layout_weight="1"
-        tools:srcCompat="@tools:sample/avatars"/>
+
     <TextView
         android:id="@+id/date_tv"
         android:layout_width="wrap_content"

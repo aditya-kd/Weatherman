@@ -112,8 +112,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
 
 
         Forecast obj = values.get(position);
-        holder.max.setText(obj.getMax());
-        holder.min.setText(obj.getMin());
+        holder.max.setText(obj.getMax()+"°");
+        holder.min.setText(obj.getMin()+"°");
         holder.date.setText(obj.getDate());
         holder.day_icon.setImageResource(iconList[Integer.parseInt(obj.getDay_Icon_num())]);
         holder.containerView.setTag(obj);

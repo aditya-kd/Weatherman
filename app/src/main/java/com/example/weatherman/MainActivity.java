@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,62 +39,50 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity {
+    private RequestQueue requestQueue;
 
     private Context AppContext;
-    Integer[] iconList= new Integer[50];
-    private RequestQueue requestQueue;
-    private RequestQueue requestQueue2;
-    LocationManager locationManager;
-    String Latitude="0",longitude="0";
-    static String citykey;
-    RecyclerView recyclerView;
+    Integer[] iconList = new Integer[50];
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*Code to get location*/
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]
-                    {Manifest.permission.ACCESS_FINE_LOCATION
-                    },100);
-        }
-        try {
-            locationManager=(LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,MainActivity.this);
-
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        AppContext=getApplicationContext();
+         RecyclerView recyclerView;
+         RecyclerView.Adapter adapter;
+         RecyclerView.LayoutManager layoutManager;
+        requestQueue= Volley.newRequestQueue(getApplicationContext());
+        AppContext = getApplicationContext();
         requestQueue= Volley.newRequestQueue(AppContext);
-
-        recyclerView = findViewById(R.id.recyclerView_main);
-
         setIconList();
-    }
-    List<Forecast> todayList= new ArrayList<>(12);
-    private void initiateLoading(String key, String name)
-    {
-        citykey=key;
-        TextView presentLocation= findViewById(R.id.present_location);
-        presentLocation.setText(name);
-        Log.d("city key in initate", citykey);
-        Log.d("key in initiateLoading", key);
+
+        String lat= getIntent().getStringExtra("Latitude");
+        String lng= getIntent().getStringExtra("Longitude");
+        String key= getIntent().getStringExtra("CityKey");
+        String cityName= getIntent().getStringExtra("cityName");
+        Log.d("LoadingScreen","Long"+lng+" Latitude "+lat+ "Key "+key+" City "+cityName);
+
+        TextView cityNameView= findViewById(R.id.present_location);
+        cityNameView.setText(cityName);
+        recyclerView=(RecyclerView)findViewById(R.id.recyclerView_main);;
+        adapter = new WeatherAdapter(this, lat, lng, key);
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(layoutManager);
+
         loadPresentCondition(key);
         loadTodayForecast(key);
-
-    RecyclerView.Adapter adapter = new WeatherAdapter(getApplicationContext(),Latitude,longitude,key);
-    recyclerView.setAdapter(adapter);
-    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-    recyclerView.setLayoutManager(layoutManager);
     }
+
+    List<Forecast> todayList= new ArrayList<>(12);
+
+
     private void loadPresentCondition(String key)
     {
         String A="https://dataservice.accuweather.com/forecasts/v1/daily/1day/";
-    String B="?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
+        String B="?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
         String url=A.concat(key);
         url=url.concat(B);
         Log.d("main","url"+url);
@@ -212,11 +201,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         );
         requestQueue.add(request);
     }
+
+
     private String toCelcius(double t)
     {
         double n=(t-32)*(0.5556);
         return (String.format(Locale.ENGLISH,"%.1f",n));
     }
+    //Date parser function
     private String manageDate(String d)
     {
         String[] months={"","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
@@ -224,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String s=d.substring(d.lastIndexOf('-')+1);
         return s+" "+months[m];
     }
+    //creates the icon list
     private void setIconList()
     {
         iconList[1]=R.drawable.sunny;
@@ -269,86 +262,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         iconList[39]=R.drawable.partly_cloudy_w_showers_night;
         iconList[41]=R.drawable.partly_cloudy_w_t_storms_night;
     }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Latitude=String.valueOf(location.getLatitude());
-        longitude=String.valueOf(location.getLongitude());
-        Log.d("mainLocation","location="+Latitude+"/"+longitude);
-        loadCityKey();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-
-    }
-
-    public void loadCityKey() {
-
-        String baseUrl = "https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t&q=" +
-                Latitude +
-                "," +
-                longitude +
-                "&details=true";
-        Log.d("mainLocation in loadKey()",Latitude+","+longitude);
-        Log.d("CityKey URL",baseUrl);
-
-        JsonObjectRequest getKeyRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                baseUrl,
-                null,
-                response -> {
-                    try {
-
-                        String myResponse= response.toString();
-                        Log.d("String Response", myResponse);
-                        String key=(myResponse.substring(20, 26));
-
-                        Log.d("KEy",key);
-
-                        int nameIndex= myResponse.indexOf("LocalizedName");
-                        nameIndex+=12+3+1;
-                        char ch='0';
-                        String LocalizedName="";
-                        ch=myResponse.charAt(nameIndex);
-                        while(ch!='"')
-                        {
-                            LocalizedName+=ch;
-                            ch=myResponse.charAt(++nameIndex);
-                        }
-                        Log.d("Key", key);
-                        Log.d("LocalizedName",LocalizedName);
-                        citykey=key;
-                        Log.d("citykey", citykey);
-                        initiateLoading(key,LocalizedName);
-                    }
-                    catch (StringIndexOutOfBoundsException e) {
-                       Log.e("catch","json error in catch");
-                    }
-                },
-                error -> {
-                    CharSequence text = "Problem at the servers. Try again after sometime";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(AppContext, text, duration);
-                    toast.show();
-                    Log.e("main", "VOLLEY ERROR");
-                    Log.e("main", "using offline data");
-                }
-        );
-        requestQueue.add(getKeyRequest);
-
-    }
 }
+
+//
+//    @Override
+//    public void onLocationChanged(@NonNull Location location) {
+//        Latitude=String.valueOf(location.getLatitude());
+//        longitude=String.valueOf(location.getLongitude());
+//        Log.d("mainLocation","location="+Latitude+"/"+longitude);
+//        loadCityKey();
+//    }
+//
+//    @Override
+//    public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//    }
+//
+//    @Override
+//    public void onProviderEnabled(@NonNull String provider) {
+//
+//    }
+//
+//    @Override
+//    public void onProviderDisabled(@NonNull String provider) {
+//
+//    }
+//
+
+
 
 //implementation 'com.android.volley:volley:1.1.1'
 //implementation "androidx.recyclerview:recyclerview:1.1.0"
