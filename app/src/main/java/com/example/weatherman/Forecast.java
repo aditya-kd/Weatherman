@@ -6,8 +6,9 @@ public class Forecast {
     String date;
     String MobileUrl;
     String day_Icon_num, night_Icon_num;
+    String text="Not much Information available for this date";
 
-    public Forecast(String min, String max, String url,String date, String icon_1, String icon_2)
+    public Forecast(String min, String max, String url,String date, String icon_1, String icon_2, String t)
     {
         this.max=max;
         this.min=min;
@@ -15,6 +16,7 @@ public class Forecast {
         this.date=date;
         this.day_Icon_num=icon_1;
         this.night_Icon_num=icon_2;
+        this.text= t;
     }
 
     public String getMin(){
@@ -37,5 +39,9 @@ public class Forecast {
 
     public String getNight_Icon_num() {
         return night_Icon_num;
+    }
+
+    public String getText() {
+        return text;
     }
 }

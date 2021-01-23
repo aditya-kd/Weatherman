@@ -8,7 +8,6 @@
     android:orientation="horizontal"
     android:paddingTop="16dp"
     >
-
     <ImageView
         android:id="@+id/icon_tv"
         android:layout_width="44dp"
@@ -22,20 +21,18 @@
         tools:hint="Max"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:paddingRight="15dp"
+        android:paddingRight="10dp"
         android:paddingLeft="16dp"
         />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/min_tv"
         tools:hint="Min"
-        android:textSize="18sp"
-        android:paddingRight="20dp"
+        android:textSize="19sp"
+        android:paddingRight="10sp"
         android:paddingLeft="10dp"
         />
-
     <TextView
         android:id="@+id/date_tv"
         android:layout_width="wrap_content"

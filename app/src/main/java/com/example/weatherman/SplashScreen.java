@@ -36,40 +36,50 @@ public class SplashScreen extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         AppContext = getApplicationContext();
         requestQueue= Volley.newRequestQueue(AppContext);
-        if(ContextCompat.checkSelfPermission(SplashScreen.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
+
+        /* Location prompts and then collecting the coordinates*/
+
+        if(ContextCompat.checkSelfPermission(SplashScreen.this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+        {
             ActivityCompat.requestPermissions(SplashScreen.this, new String[]
-                    {Manifest.permission.ACCESS_FINE_LOCATION
+                    {
+                            Manifest.permission.ACCESS_FINE_LOCATION
                     },100);
         }
         try {
             locationManager=(LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,SplashScreen.this);
-
-        }catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onLocationChanged(@NonNull Location location) {
+    public void onLocationChanged(@NonNull Location location)
+    {
         Latitude=String.valueOf(location.getLatitude());
         longitude=String.valueOf(location.getLongitude());
-        Log.d("mainLocation","location="+Latitude+"/"+longitude);
+
+        Log.d("SplashScreen","location="+Latitude+"/"+longitude);
+
         loadCityKey();
         setContentView(R.layout.activity_splash_screen);
 
     }
 
     public void loadCityKey() {
-        String finalKEY="";
+
+        /* completing the url*/
         String baseUrl = "https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t&q=" +
                 Latitude +
                 "," +
                 longitude +
                 "&details=true";
-        Log.d("mainLocation in loadKey()",Latitude+","+longitude);
-        Log.d("CityKey URL",baseUrl);
+
+        Log.d("SplashScreen ","COORDINATES: "+Latitude+","+longitude);
+        Log.d("SplashScreen","URL: "+baseUrl);
 
         JsonObjectRequest getKeyRequest = new JsonObjectRequest(
                 Request.Method.GET,
@@ -79,30 +89,27 @@ public class SplashScreen extends AppCompatActivity implements LocationListener 
                     try {
 
                         String myResponse= response.toString();
-                        Log.d("String Response", myResponse);
                         String key=(myResponse.substring(20, 26));
-
-                        Log.d("KEy",key);
-
+                        String LocalizedName="";
                         int nameIndex= myResponse.indexOf("LocalizedName");
                         nameIndex+=12+3+1;
                         char ch='0';
-                        String LocalizedName="";
                         ch=myResponse.charAt(nameIndex);
+
                         while(ch!='"')
                         {
-                            LocalizedName+=ch;
+                            LocalizedName+= ch;
                             ch=myResponse.charAt(++nameIndex);
                         }
-                        Log.d("Key", key);
-                        Log.d("LocalizedName",LocalizedName);
+
+                        Log.d("SplashScreen","KEY: "+key);
+                        Log.d("SplashScreen","LocalizedName"+ LocalizedName);
 
                         this.setKey(key, LocalizedName);
-
-                        //initiateLoading(key,LocalizedName);
                     }
-                    catch (StringIndexOutOfBoundsException e) {
-                        Log.e("catch","json error in catch");
+                    catch (StringIndexOutOfBoundsException e)
+                    {
+                        Log.e("SplashScreen","json error in catch");
                     }
                 },
                 error -> {
@@ -110,19 +117,20 @@ public class SplashScreen extends AppCompatActivity implements LocationListener 
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(AppContext, text, duration);
                     toast.show();
-                    Log.e("main", "VOLLEY ERROR");
-                    Log.e("main", "using offline data");
+                    Log.e("SplashScreen", "VOLLEY ERROR");
+                    Log.e("SplashScreen", "using offline data");
                 }
         );
         requestQueue.add(getKeyRequest);
-
     }
 
+    /* this function creates an Intent as soon as the key and localized name is fetched*/
     public void setKey(String key, String cityName)
     {
         globalKey= key;
-        Log.d("GlobalKey Value: ",globalKey);
+        Log.d("SplashScreen","GlobalKey Value: "+globalKey);
         i=new Intent(SplashScreen.this, MainActivity.class);
+
         Log.d("SpalshScreen","Lat"+Latitude+ "Long "+longitude+" CityKey "+globalKey+" Localized Name: "+cityName);
 
         i.putExtra("Latitude",Latitude);
@@ -139,17 +147,3 @@ public class SplashScreen extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(@NonNull String provider) {}
 }
-//new Handler().postDelayed(new Runnable() {
-//@Override
-//public void run() {
-//        Intent i=new Intent(MainActivity.this,
-//        SecondActivity.class);
-//        //Intent is used to switch from one activity to another.
-//
-//        startActivity(i);
-//        //invoke the SecondActivity.
-//
-//        finish();
-//        //the current activity will get finished.
-//        }
-//        }, SPLASH_SCREEN_TIME_OUT);

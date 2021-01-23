@@ -36,11 +36,9 @@ import javax.xml.XMLConstants;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
 
     Context mContext;
-    //    ViewGroup parentVG;
     static String DayIcon, NightIcon;
     Integer[] iconList = new Integer[50];
     String lat, lon, cityKey;
-
 
     public static class WeatherViewHolder extends RecyclerView.ViewHolder {
 
@@ -50,7 +48,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         public TextView min;
         public TextView date;
         public ImageView day_icon;
-
 
         //constructor
         public WeatherViewHolder(View v) {
@@ -69,47 +66,44 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
                 intent.putExtra("url", myForecat.MobileUrl);
                 intent.putExtra("DayIcon", myForecat.night_Icon_num);
                 intent.putExtra("NightIcon", myForecat.day_Icon_num);
+                intent.putExtra("Text", myForecat.text);
                 v1.getContext().startActivity(intent);
             });//onCLickListener
         }//constructor closed
     }//viewHolder closed
 
+    /*List contains the 5 day forecasts*/
     private final List<Forecast> values = new ArrayList<>();
+    /*Network requests to be made using this Object only*/
     private final RequestQueue requestQueue;
 
+    //Constructor which is going to be called for the start of loading in MainActivity
 
-    //constructor
     public WeatherAdapter(Context context, String a, String b, String c) {
-        requestQueue = Volley.newRequestQueue(context);
 
+        requestQueue = Volley.newRequestQueue(context);
         mContext = context;
         this.lat = a;
         this.lon = b;
         this.cityKey=c;
+
         setIconList();
-
-
         loadForecast();
     }
 
     @Override
-    public int getItemCount() {
-        return values.size();
-    }
+    public int getItemCount() {  return values.size();   }
 
     @NonNull
     @Override
     public WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.weather_row, parent,
-                        false);
-//        parentVG=parent;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.weather_row, parent, false);
+
         return new WeatherViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull WeatherViewHolder holder, int position) {
-
 
         Forecast obj = values.get(position);
         holder.max.setText(obj.getMax()+"°");
@@ -121,28 +115,27 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
 
     List<String> headline = new ArrayList<>();
 
-    //function to load weather
     public void loadForecast() {
         String url = "https://dataservice.accuweather.com/forecasts/v1/daily/5day/" +
-                cityKey +
-                "?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
-        Log.d("myOutput", "URL used " + url);
+                      cityKey +
+                     "?apikey=zcrjySAaq4Y3sQo1aWqi9ddA9mpo5P4t";
 
-        //onResponse
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
+        Log.d("WeatherAdapter", "URL sent: " + url);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
+
                         JSONObject firstObject = response.getJSONObject("Headline");
                         headline.add(firstObject.getString("EffectiveDate"));
                         headline.add(firstObject.getString("Severity"));
+                        String text=firstObject.getString("Text");
                         headline.add(firstObject.getString("Text"));
                         headline.add(firstObject.getString("MobileLink"));
-                        //this data is to be used with notifications
-                        for (int i = 0; i < headline.size(); i++) {
-                            Log.d("myOutput", headline.get(i));
+
+                        for (int i = 0; i < headline.size(); i++)
+                        {
+                            Log.d("WeatherAdapter","HEADLINE: "+headline.get(i));
                         }
 
                         JSONArray results = response.getJSONArray("DailyForecasts");
@@ -150,42 +143,40 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject currDay = results.getJSONObject(i);
 
+                            /* Data values to store information downloaded*/
                             String MobileUrl = currDay.getString("MobileLink");
                             String date = currDay.getString("Date");
                             String pDate = date.substring(0, date.indexOf('T'));
 
+                            /* JSON Objects to extract weather data*/
                             JSONObject Temperature = currDay.getJSONObject("Temperature");
                             JSONObject Day = currDay.getJSONObject("Day");
                             JSONObject Night = currDay.getJSONObject("Night");
-
                             JSONObject minT = Temperature.getJSONObject("Minimum");
                             JSONObject maxT = Temperature.getJSONObject("Maximum");
 
+                            /* Moving those objects data to program variables*/
                             DayIcon = Day.getString("Icon");
                             NightIcon = Night.getString("Icon");
 
+                            /* Data processing into readable formats*/
                             double min = minT.getDouble("Value");
                             double max = maxT.getDouble("Value");
                             pDate = manageDate(pDate);
 
-                            Log.d("myOutput", max + " is the max");
-                            Log.d("myOutput", pDate);
-                            Log.d("myOutput", DayIcon + "/" + NightIcon);
+                            /*Logging data for debugging purposes*/
+                            Log.d("WeatherAdapter", "MAX: "+max+" DATE: "+pDate+" ICON NUMBERS: "+DayIcon+" and "+NightIcon);
 
-                            Forecast current = new Forecast(
-                                    toCelcius(min),
-                                    toCelcius(max),
-                                    MobileUrl,
-                                    pDate,
-                                    (DayIcon),
-                                    (NightIcon));
+                            /* Passing all the extracted info to Forecast objects*/
+                            Forecast current = new Forecast(toCelcius(min), toCelcius(max), MobileUrl, pDate, DayIcon, NightIcon, text);
+                            /* Adding those objects to the list */
                             values.add(current);
                         }
-                        Log.d("Values", values.size() + "");
                         notifyDataSetChanged();
-                    }//try ends here
-                    catch (JSONException e) {
-                        Log.e("myError", "JSON ERROR", e);
+                    }
+                    catch (JSONException e)
+                    {
+                        Log.e("WeatherAdapter", "JSON ERROR", e);
                     }
                 }
                 , error -> {
@@ -193,24 +184,25 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(mContext, text, duration);
             toast.show();
-            Log.e("myOutput", "VOLLEY ERROR");
-            Log.e("myOutput", "using offline data");
-        });//request
+            Log.e("WeatherAdapter", "VOLLEY ERROR using offline data");
+        });
         requestQueue.add(request);
-    }//loadForecast ends here
+    }
 
-    private String toCelcius(double t) {
+    /* Utility Functions */
+    private String toCelcius(double t)
+    {
         double n = (t - 32) * (0.5556);
         return (String.format(Locale.ENGLISH, "%.1f", n));
     }
 
-    private String manageDate(String d) {
+    private String manageDate(String d)
+    {
         String[] months = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         int m = Integer.parseInt(d.substring(5, d.lastIndexOf('-')));
         String s = d.substring(d.lastIndexOf('-') + 1);
         return s + " " + months[m];
     }
-
     private void setIconList() {
         iconList[1] = R.drawable.sunny;
         iconList[2] = R.drawable.mostly_sunny;
@@ -255,6 +247,4 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         iconList[39] = R.drawable.partly_cloudy_w_showers_night;
         iconList[41] = R.drawable.partly_cloudy_w_t_storms_night;
     }
-
-
 }

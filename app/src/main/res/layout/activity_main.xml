@@ -14,21 +14,24 @@
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical">
-        <TextView
-            android:id="@+id/present_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingBottom="5dp"
 
-            android:text="Today" />
         <TextView
             android:id="@+id/present_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="19sp"
             android:paddingLeft="5dp"
-            android:text="City Name" />
+            android:text="City Name"
+            />
+    <TextView
+        android:id="@+id/present_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="5dp"
+        android:text="Today"
+        />
 
 </LinearLayout>
         <LinearLayout
@@ -114,7 +117,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:textSize="18sp"
+        android:padding="10dp"
         android:text="Forecasts"/>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
